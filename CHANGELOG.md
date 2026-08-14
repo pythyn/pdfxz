@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file.
 
-## [0.2.0]
+## [0.2.1]
 
 ### Changed
 - TUI redesigned to be more compact and minimal: smaller fields/buttons, a

@@ -1,209 +1,406 @@
 # pdfxz
 
-A terminal UI and CLI for compressing PDF files with [Ghostscript](https://www.ghostscript.com/).
+**Simple PDF compression from your terminal.**
 
-```
+`pdfxz` is a small command-line tool for compressing PDF files with [Ghostscript](https://www.ghostscript.com/).
+
+It gives you two ways to work:
+
+* **Interactive TUI** — easy to use with menus and buttons.
+* **CLI** — great for scripts, batch jobs, and automation.
+
+```text
 ┌───────────────────────────────────────────────────────────────┐
-│ PDFXZ                                                         │
-│ PDF Compression Utility                                       │
+│                         P D F X Z                             │
+│                  PDF Compression Utility                      │
 ├───────────────────────────────────────────────────────────────┤
-│  INPUT  (a PDF file or a directory)                           │
-│  [ ~/Documents/papers                                    ]    │
+│ INPUT                                                         │
+│ [ ~/Documents/papers                          ] [ Browse... ] │
 │                                                               │
-│  OUTPUT (optional - a sensible default is used if left blank) │
-│  [ ~/Documents/compressed                                ]    │
+│ OUTPUT                                                        │
+│ [ ~/Documents/compressed                      ] [ Browse... ] │
 │                                                               │
-│  QUALITY                                                      │
-│  [ Balanced ▼ ]                                               │
-│                                                               │
-│                                                               │
+│ QUALITY                                                       │
+│ ▰▰▰▯▯  Balanced                                               │
 │                                                               │
 │                     [ Compress PDFs ]                         │
-├───────────────────────────────────────────────────────────────┤
-│ Status: Ready                                                 │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-## Features
+## Why pdfxz?
 
-- **Interactive TUI** for point-and-shoot use - no CLI syntax to memorize.
-- **Non-interactive CLI** for scripts, cron jobs, and CI.
-- **Five explicit compression profiles**, from archival quality to maximum size reduction.
-- **Batch directory processing** with optional recursion, one bad file never aborts the batch.
-- **Live, honest progress** - per-file counts and results, no fabricated percentages.
-- **Cancellable** mid-batch, with automatic cleanup of partial output.
-- **Data-safe by default**: never overwrites the input, never silently clobbers an existing output.
-- **Cross-platform**: Linux, macOS, and Windows, wherever Python and Ghostscript are available.
+* **Easy to use:** run `pdfxz` and use the interactive interface.
+* **Works without the TUI:** use simple commands for scripts and automation.
+* **Compress one file or many:** process a PDF or an entire folder.
+* **Five clear quality levels:** choose how much compression you want.
+* **Safe by default:** your original PDF is never overwritten.
+* **Safe batch processing:** one bad PDF does not stop the other files.
+* **Automatic cleanup:** incomplete output files are removed after failure or cancellation.
+* **Built-in file browser:** use **Browse...** instead of typing long paths.
+* **Clear progress:** see which files finished and how much space was saved.
+* **Linux, macOS, and Windows:** works wherever Python and Ghostscript are available.
 
 ## Installation
+
+### 1. Install pdfxz
 
 ```bash
 pip install pdfxz
 ```
 
-or, from a local checkout:
+To install from a local checkout:
 
 ```bash
 pip install .
 ```
 
-### Ghostscript requirement
+`pdfxz` requires **Python 3.10 or newer**.
 
-pdfxz compresses PDFs *using* Ghostscript, but does not bundle it. Install Ghostscript separately and make sure it's on your `PATH`:
+### 2. Install Ghostscript
 
-| Platform | Command |
-| --- | --- |
-| Ubuntu / Debian | `sudo apt install ghostscript` |
-| Fedora | `sudo dnf install ghostscript` |
-| Arch Linux | `sudo pacman -S ghostscript` |
-| macOS (Homebrew) | `brew install ghostscript` |
-| Windows | Download the installer from [ghostscript.com](https://www.ghostscript.com/releases/gsdnld.html) |
+`pdfxz` uses Ghostscript to do the actual PDF compression, so Ghostscript must be installed separately.
 
-On Windows, pdfxz looks for `gswin64c`, `gswin32c`, or `gs` on `PATH` (the console builds, not the GUI `gswin64.exe`). You can also point pdfxz at a specific binary with the `PDFXZ_GS_PATH` environment variable.
+#### Ubuntu / Debian
 
-If Ghostscript isn't found, pdfxz tells you clearly instead of failing with a cryptic error.
+```bash
+sudo apt install ghostscript
+```
 
-## Usage
+#### Fedora
 
-### TUI
+```bash
+sudo dnf install ghostscript
+```
+
+#### Arch Linux
+
+```bash
+sudo pacman -S ghostscript
+```
+
+#### macOS
+
+Using Homebrew:
+
+```bash
+brew install ghostscript
+```
+
+#### Windows
+
+Download and install Ghostscript from:
+
+https://www.ghostscript.com/releases/gsdnld.html
+
+On Windows, `pdfxz` looks for `gswin64c`, `gswin32c`, or `gs` on `PATH`. You can also set `PDFXZ_GS_PATH` when Ghostscript is installed somewhere else.
+
+Check that Ghostscript works:
+
+```bash
+gs --version
+```
+
+On Windows, you can use:
+
+```powershell
+gswin64c --version
+```
+
+If Ghostscript is missing, `pdfxz` shows a clear error instead of a confusing failure.
+
+---
+
+## How to Use
+
+### Interactive TUI
+
+The easiest way to start:
 
 ```bash
 pdfxz
 ```
 
-Pick an input PDF or folder and, optionally, a destination folder - either by typing a path or using the **Browse…** buttons, which open a built-in folder/file browser. Drag the **Quality** slider (arrow keys or click) to choose a compression profile. Directories are always scanned recursively, missing output folders are created automatically, and an existing output is never overwritten - a uniquely-named file (`report_compressed (2).pdf`, etc.) is written alongside it instead, so there's nothing to configure and nothing you can accidentally clobber.
+Choose your input PDF or folder, choose an output folder if needed, select a quality level, and press **Compress PDFs**.
 
-Keyboard shortcuts (also shown at the bottom of the screen): `Esc` cancels a running batch; `q` quits (when a text field isn't focused); on the report screen, `n` starts a new batch. Long filenames are truncated in the UI - highlight a row in the report table to see the full path underneath it.
+### Browse files and folders
 
-### CLI
+The TUI includes **Browse...** buttons for both input and output.
+
+You can select:
+
+* a PDF file
+* an input folder
+* an output folder
+
+You do not need to type the complete path yourself.
+
+### v0.2.1: fewer settings, less to worry about
+
+The TUI no longer asks you to manually configure:
+
+* Recursive scanning
+* Create missing directories
+* Overwrite existing files
+
+These are handled automatically:
+
+* folders are always scanned **recursively**
+* missing output folders are created automatically
+* existing output files are **never overwritten**
+* when a filename already exists, pdfxz creates a new unique filename instead
+
+The CLI still provides explicit options for these settings.
+
+### File sizes
+
+The TUI always displays file sizes in **MB** for a consistent view.
+
+### Useful TUI shortcuts
+
+* `Esc` — cancel a running batch
+* `q` — quit
+* `n` — start a new batch from the report screen
+
+Long filenames are shortened on screen. Select a report row to see the full path.
+
+---
+
+## CLI
+
+The CLI is useful when you want commands that can be reused in scripts.
+
+### Compress one PDF
 
 ```bash
-pdfxz paper.pdf                              # -> paper_compressed.pdf
-pdfxz input.pdf output.pdf                   # explicit output (positional)
-pdfxz input.pdf -o output.pdf                # explicit output (flag)
-pdfxz ~/papers -o ~/compressed                # compress a whole directory
-pdfxz ~/papers -o ~/compressed --quality balanced
-pdfxz ~/papers -o ~/compressed -q strong -r   # recurse into subdirectories
-pdfxz input.pdf -o ~/new/path/out.pdf -p      # create missing output dirs
+pdfxz paper.pdf
 ```
 
-```
-usage: pdfxz [-h] [-o PATH] [-p] [-q LEVEL] [-r] [--overwrite] [--no-tui]
-             [--debug] [--version]
-             [INPUT] [OUTPUT]
+Creates:
 
-positional arguments:
-  INPUT                 A PDF file or a directory containing PDFs.
-  OUTPUT                Output PDF file or directory (positional form).
-
-options:
-  -h, --help            show this help message and exit
-  -o PATH, --output PATH
-                        Output PDF file or directory.
-  -p, --parents         Create missing output directories (like 'mkdir -p').
-  -q LEVEL, --quality LEVEL
-                        Compression profile: balanced, high, maximum,
-                        maximum-compression, strong (default: balanced).
-  -r, --recursive       Recurse into subdirectories when INPUT is a directory
-                        (default: off, top level only).
-  --overwrite           Allow overwriting an existing output file.
-  --no-tui              Never launch the interactive TUI; exit with an error
-                        if INPUT is missing instead of prompting.
-  --debug               Enable verbose debug logging.
-  --version             show program's version number and exit
+```text
+paper_compressed.pdf
 ```
 
-Running `pdfxz` with no arguments launches the TUI. Passing `INPUT` runs non-interactively - the TUI never blocks a script. `--no-tui` is a safety net for automation: if a script accidentally omits `INPUT`, pdfxz fails fast with a clear error instead of trying to open an interactive terminal.
+### Choose the output file
 
-Exit codes: `0` on full success, `1` if any file failed, was skipped as invalid, or was cancelled, `2` on a usage error, `130` on Ctrl+C.
+```bash
+pdfxz input.pdf -o output.pdf
+```
 
-## Compression profiles
+You can also use the positional form:
 
-Ghostscript's built-in `/screen`, `/ebook`, `/printer`, `/prepress` presets aren't used directly - their exact behavior has varied across Ghostscript versions. Instead, pdfxz defines five explicit, documented profiles built around image downsampling:
+```bash
+pdfxz input.pdf output.pdf
+```
 
-| Level | Color/Gray DPI | Mono DPI | Goal |
-| --- | --- | --- | --- |
-| Maximum Quality | 300 | 1200 | Minimal quality loss; archival copies |
-| High Quality | 200 | 600 | Good visual quality, moderate compression |
-| Balanced *(default)* | 150 | 300 | General-purpose default |
-| Strong Compression | 120 | 200 | Smaller files, visible trade-off |
-| Maximum Compression | 72 | 150 | Prioritizes file size |
+### Compress a folder
 
-No profile guarantees a specific percentage reduction - actual results depend heavily on the PDF's contents (image-heavy scans compress far more than text-only documents).
+```bash
+pdfxz ~/papers -o ~/compressed
+```
 
-## Batch processing & output naming
+### Choose a quality level
 
-- **Single file**: `paper.pdf` -> `paper_compressed.pdf` by default, or your chosen output path.
-- **Directory**: each discovered PDF gets a `..._compressed.pdf` sibling under the output directory.
-- **Recursive scans**: pdfxz preserves the input's relative directory structure under the output directory, so `papers/a/report.pdf` and `papers/b/report.pdf` never collide or overwrite each other.
-- One failed or invalid file never aborts the batch - it's recorded and processing continues.
+```bash
+pdfxz paper.pdf -q balanced
+```
 
-## Output & overwrite behavior
+### Scan subdirectories
 
-- pdfxz never overwrites the input file, and rejects any operation where input and output resolve to the same file.
-- An existing output file is left untouched unless you pass `--overwrite` (CLI) or check "Overwrite existing output" (TUI).
-- Missing output directories are only created if you pass `-p/--parents` (CLI) or leave "Create missing directories" checked (TUI, on by default).
-- If Ghostscript fails or is cancelled partway through, any partial output file is deleted; the input is never touched.
+```bash
+pdfxz ~/papers -o ~/compressed -q strong -r
+```
 
-## Defaults
+### Create missing output directories
 
-| Setting | Default |
-| --- | --- |
-| Quality | `balanced` |
-| Recursive | off (top-level only) |
-| Create missing directories | on (TUI) / off (CLI, use `-p`) |
-| Overwrite | off |
+```bash
+pdfxz input.pdf -o ~/new/path/output.pdf -p
+```
 
-## Troubleshooting
+### Never start the TUI
 
-**"Ghostscript is not installed"** - install it and confirm `gs --version` (or `gswin64c --version` on Windows) works in your terminal.
+For scripts and automation:
 
-**"Output file already exists"** - pass `--overwrite`, or choose a different output path.
+```bash
+pdfxz input.pdf --no-tui
+```
 
-**"Output path is the same as the input path"** - choose a distinct output location; pdfxz refuses to overwrite the source PDF.
+When `INPUT` is supplied, pdfxz already runs non-interactively. `--no-tui` is useful when you want a script to fail immediately instead of opening the interactive interface by mistake.
 
-**"No PDF files found"** - check that files actually end in `.pdf` (case-insensitive) and, for nested folders, that you passed `-r/--recursive`.
+---
 
-**A file is reported invalid** - pdfxz checks the `%PDF-` signature, not just the extension; the file may be corrupt or not actually a PDF.
+## Common CLI Options
+
+| Option                | What it does                                 |
+| --------------------- | -------------------------------------------- |
+| `-o, --output PATH`   | Set the output PDF or directory              |
+| `-p, --parents`       | Create missing output directories            |
+| `-q, --quality LEVEL` | Choose the compression level                 |
+| `-r, --recursive`     | Scan subdirectories too                      |
+| `--overwrite`         | Allow an existing output file to be replaced |
+| `--no-tui`            | Never launch the interactive interface       |
+
+The available quality values are `maximum`, `high`, `balanced`, `strong`, and `maximum-compression`.
+
+---
+
+## Compression Levels
+
+`pdfxz` has five explicit compression profiles. The default is **Balanced**.
+
+| Level                 | Best for                        | Quality   | Compression |
+| --------------------- | ------------------------------- | --------- | ----------- |
+| `maximum`             | Archival copies                 | Highest   | Lowest      |
+| `high`                | Good quality with smaller files | Very high | Moderate    |
+| `balanced`            | Everyday use                    | Good      | Moderate    |
+| `strong`              | Smaller files                   | Lower     | Strong      |
+| `maximum-compression` | Smallest possible files         | Lowest    | Highest     |
+
+The profiles use different image downsampling settings. Higher compression generally means smaller files and more visible quality loss.
+
+### Important
+
+There is no fixed compression percentage.
+
+A scanned PDF with many images may become much smaller, while a text-only PDF may change very little.
+
+---
+
+## Safe Output and File Naming
+
+`pdfxz` is designed to keep your files safe.
+
+### Your original PDF is never overwritten
+
+The compressor refuses to use the same file as both input and output. The original input is never modified or deleted.
+
+### Existing files are protected
+
+In the CLI, an existing output is not replaced unless you explicitly use:
+
+```bash
+--overwrite
+```
+
+In the TUI, existing outputs are never overwritten; pdfxz creates a unique filename instead.
+
+For example:
+
+```text
+report.pdf
+report_compressed.pdf
+report_compressed (2).pdf
+report_compressed (3).pdf
+```
+
+### Batch folders stay organized
+
+When scanning folders recursively, pdfxz keeps the original folder structure in the output directory. This prevents files with the same name in different folders from accidentally replacing each other.
+
+### Failed or cancelled jobs are cleaned up
+
+If Ghostscript fails or you cancel a compression, pdfxz removes any partial output file. Your input PDF remains untouched.
+
+### Invalid PDFs are detected
+
+pdfxz does not trust the `.pdf` extension alone. It also checks for the `%PDF-` file signature.
+
+---
 
 ## Development
 
+Clone the repository:
+
 ```bash
-git clone https://github.com/example/pdfxz
+git clone https://github.com/pythyn/pdfxz
 cd pdfxz
+```
+
+Create a virtual environment:
+
+```bash
 python -m venv .venv
-source .venv/bin/activate          # .venv\Scripts\activate on Windows
+```
+
+Activate it.
+
+Linux / macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows:
+
+```powershell
+.venv\Scripts\activate
+```
+
+Install the development dependencies:
+
+```bash
 pip install -e ".[dev]"
 ```
 
-### Project layout
+The project uses `pytest` and `pytest-asyncio` for development and testing.
 
-```
-src/pdfxz/
-├── __init__.py           # package version
-├── __main__.py           # `python -m pdfxz` entry point
-├── cli.py                # argument parsing + non-interactive execution
-├── app.py                # Textual TUI (config / processing / report screens)
-├── app.tcss              # TUI stylesheet
-├── compressor.py         # Ghostscript subprocess integration
-├── workers.py            # framework-agnostic batch orchestration (shared by CLI + TUI)
-├── scanner.py            # PDF discovery + %PDF- signature validation
-├── models.py             # typed result/state dataclasses
-├── profiles.py           # the five compression profiles
-├── formatting.py         # size/percentage/ratio/duration helpers
-└── utils.py              # Ghostscript discovery, path safety, output planning
-```
+## Testing
 
-The compressor has no knowledge of the TUI or CLI; the scanner has no knowledge of Ghostscript; the TUI and CLI both drive the same `BatchRunner`. This keeps each layer independently testable.
-
-### Testing
+Run the full test suite:
 
 ```bash
 pytest
 ```
 
-The test suite mocks Ghostscript with a small fake executable (`tests/fixtures/fake_gs.py`), so it never requires a real Ghostscript installation. It covers the scanner, compressor (including cancellation and cleanup), profiles, formatting helpers, the CLI, and a TUI smoke test.
+The tests cover the main parts of the project, including:
+
+* TUI startup and interaction
+* CLI parsing and execution
+* PDF compression
+* cancellation and cleanup
+* compression profiles
+* file scanning and PDF validation
+* formatting and utility functions
+
+The test suite uses a small fake Ghostscript executable, so the tests do **not** need a real Ghostscript installation.
+
+The v0.2.1 tests also verify that the old TUI settings for recursive scanning, missing directories, and overwrite behavior are no longer present.
+
+## Project Structure
+
+```text
+pdfxz/
+├── src/pdfxz/
+│   ├── app.py           # Interactive TUI
+│   ├── cli.py           # Command-line interface
+│   ├── compressor.py    # Ghostscript compression
+│   ├── profiles.py      # Compression profiles
+│   ├── scanner.py       # PDF discovery and validation
+│   ├── workers.py       # Batch processing
+│   ├── models.py        # Result and state models
+│   ├── formatting.py    # Output formatting helpers
+│   └── utils.py         # Paths, Ghostscript, and safety helpers
+│
+├── tests/
+│   ├── test_app.py
+│   ├── test_cli.py
+│   ├── test_compressor.py
+│   ├── test_profiles.py
+│   ├── test_scanner.py
+│   ├── test_utils.py
+│   ├── test_formatting.py
+│   └── fixtures/
+│       └── fake_gs.py
+│
+├── CHANGELOG.md
+├── LICENSE
+└── pyproject.toml
+```
+
+The TUI and CLI use the same underlying compression and batch-processing code, which keeps behavior consistent between both modes.
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT License.
+
+See [LICENSE](LICENSE) for the full license text.
