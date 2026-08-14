@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pdfxz"
+version = "0.2.0"
+description = "A terminal UI and CLI for compressing PDF files with Ghostscript."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "pdfxz contributors" }]
+keywords = ["pdf", "compression", "ghostscript", "tui", "cli", "textual"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Environment :: Console",
+    "Environment :: Console :: Curses",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Utilities",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "textual>=0.58.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+pdfxz = "pdfxz.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/pythyn/pdfxz"
+Issues = "https://github.com/pythyn/pdfxz/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pdfxz"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/pdfxz/app.tcss" = "pdfxz/app.tcss"
+
+[tool.hatch.build.targets.sdist]
+include = ["src/pdfxz", "tests", "README.md", "LICENSE", "CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
